@@ -1,0 +1,15 @@
+.add-event {
+  background-color: #6300c6;
+  border-radius: 8px;
+  height: 16px;
+  position: relative;
+  width: 16px;
+}
+
+.add-event .subtract {
+  height: 10px;
+  left: 3px;
+  position: absolute;
+  top: 3px;
+  width: 10px;
+}

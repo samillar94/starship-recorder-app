@@ -1,0 +1,16 @@
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Gelion, sans-serif;
+}
+
+div.ol-mouse-position {
+  font-size: smaller;
+  top: auto;
+  right: auto;
+  bottom: 8px;
+  left: 8px;
+}

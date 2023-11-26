@@ -1,0 +1,29 @@
+.tool-add-record {
+  background-color: #ffffff;
+  border-radius: 23px;
+  height: 46px;
+  width: 46px;
+}
+
+.tool-add-record .add-thing-info-instance {
+  height: 29px !important;
+  left: 9px !important;
+  position: relative !important;
+  top: 9px !important;
+  width: 29px !important;
+}
+
+.tool-add-record .design-component-instance-node {
+  height: 18px !important;
+  left: 5px !important;
+  top: 5px !important;
+  width: 18px !important;
+}
+
+.tool-add-record .add-thing-info-2 {
+  background-color: #a26100 !important;
+  border-radius: 17px !important;
+  height: 29px !important;
+  overflow: hidden !important;
+  width: unset !important;
+}

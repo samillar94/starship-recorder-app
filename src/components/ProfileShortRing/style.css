@@ -1,0 +1,11 @@
+.profile-short-ring {
+  height: 2px;
+  width: 9px;
+}
+
+.profile-short-ring .rectangle-7 {
+  background-color: var(--rw-dark);
+  border: 0.3px solid;
+  border-color: var(--rw-light);
+  height: 2px;
+}

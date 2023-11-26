@@ -1,0 +1,250 @@
+.marker-stack .overlap-5 {
+  position: relative;
+}
+
+.marker-stack .marker-circle {
+  left: 0 !important;
+  position: absolute !important;
+  top: 0 !important;
+}
+
+.marker-stack .marker-booster {
+  background-color: var(--superheavy-red) !important;
+}
+
+.marker-stack .marker-m-circle {
+  left: 33px !important;
+}
+
+.marker-stack .marker-ship {
+  background-color: var(--ship-blue) !important;
+}
+
+.marker-stack .frame {
+  align-items: flex-end;
+  display: inline-flex;
+  gap: 10px;
+  justify-content: center;
+  left: 2px;
+  position: absolute;
+  top: 21px;
+}
+
+.marker-stack .full-stack-with {
+  color: transparent;
+  font-family: "Gelion-Regular", Helvetica;
+  font-size: 10px;
+  font-weight: 400;
+  height: 49px;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-top: -1px;
+  position: relative;
+  width: 82px;
+}
+
+.marker-stack .SHIP-NAME-on-BOOSTER {
+  color: transparent;
+  font-family: "Gelion-Bold", Helvetica;
+  font-size: 10px;
+  font-weight: 700;
+  left: 0;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: -1px;
+  width: 82px;
+}
+
+.marker-stack .overlap-6 {
+  position: absolute;
+  width: 94px;
+}
+
+.marker-stack .frame-wrapper {
+  background-color: #ffffff;
+  border-radius: 45px;
+  height: 198px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 90px;
+}
+
+.marker-stack .frame-2 {
+  align-items: flex-end;
+  display: inline-flex;
+  gap: 10px;
+  justify-content: center;
+  left: 4px;
+  position: relative;
+  top: 99px;
+}
+
+.marker-stack .full-stack-with-2 {
+  color: var(--rw-dark);
+  font-family: "Gelion-Regular", Helvetica;
+  font-size: 10px;
+  font-weight: 400;
+  height: 49px;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-top: -1px;
+  position: relative;
+  width: 82px;
+}
+
+.marker-stack .SHIP-NAME-on-BOOSTER-2 {
+  color: var(--rw-dark);
+  font-family: "Gelion-Bold", Helvetica;
+  font-size: 10px;
+  font-weight: 700;
+  left: 0;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: -1px;
+  width: 82px;
+}
+
+.marker-stack .overlap-wrapper {
+  height: 90px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 94px;
+}
+
+.marker-stack .overlap-7 {
+  background-color: var(--stack-pink);
+  border-radius: 45px;
+  box-shadow: 0px 4px 4px #00000040;
+  height: 90px;
+  position: relative;
+  width: 90px;
+}
+
+.marker-stack .img {
+  height: 86px;
+  left: 2px;
+  position: absolute;
+  top: 2px;
+  width: 86px;
+}
+
+.marker-stack .s-b {
+  -webkit-text-stroke: 1px transparent;
+  color: var(--rw-dark);
+  font-family: var(--marker-main-label-maximum-font-family);
+  font-size: var(--marker-main-label-maximum-font-size);
+  font-style: var(--marker-main-label-maximum-font-style);
+  font-weight: var(--marker-main-label-maximum-font-weight);
+  height: 36px;
+  left: 25px;
+  letter-spacing: var(--marker-main-label-maximum-letter-spacing);
+  line-height: var(--marker-main-label-maximum-line-height);
+  position: absolute;
+  text-align: center;
+  top: 26px;
+}
+
+.marker-stack .element-2 {
+  color: #ffffff;
+  font-family: var(--generated-ID-font-family);
+  font-size: var(--generated-ID-font-size);
+  font-style: var(--generated-ID-font-style);
+  font-weight: var(--generated-ID-font-weight);
+  height: 12px;
+  left: 31px;
+  letter-spacing: var(--generated-ID-letter-spacing);
+  line-height: var(--generated-ID-line-height);
+  position: absolute;
+  text-align: center;
+  top: 6px;
+  white-space: nowrap;
+}
+
+.marker-stack .overlap-8 {
+  height: 67px;
+  left: 220px;
+  position: absolute;
+  top: 33px;
+  width: 38px;
+}
+
+.marker-stack .pin-button-instance {
+  height: 38px !important;
+  left: 0 !important;
+  position: absolute !important;
+  top: 0 !important;
+  width: 38px !important;
+}
+
+.marker-stack .union-wrapper {
+  background-color: #ffffff;
+  border-radius: 14.89px;
+  box-shadow: 0px 4px 4px #00000040;
+  height: 30px;
+  left: 4px;
+  position: absolute;
+  top: 37px;
+  width: 30px;
+}
+
+.marker-stack .union-2 {
+  height: 12px;
+  left: 9px;
+  position: absolute;
+  top: 9px;
+  width: 12px;
+}
+
+.marker-stack .marker-9m-circle-90px {
+  left: 119px !important;
+  position: absolute !important;
+  top: 117px !important;
+}
+
+.marker-stack .marker-circle-instance {
+  left: 119px !important;
+  position: absolute !important;
+  top: 9px !important;
+}
+
+.marker-stack.property-1-labelled {
+  height: 208px;
+  width: 246px;
+}
+
+.marker-stack.property-1-default {
+  height: 90px;
+  width: 90px;
+}
+
+.marker-stack.property-1-labelled .overlap-5 {
+  -webkit-backdrop-filter: blur(40px) brightness(100%);
+  backdrop-filter: blur(40px) brightness(100%);
+  background-color: #ffffffbf;
+  border-radius: 55px;
+  height: 217px;
+  left: -10px;
+  top: -9px;
+  width: 269px;
+}
+
+.marker-stack.property-1-default .overlap-5 {
+  height: 90px;
+  width: 94px;
+}
+
+.marker-stack.property-1-labelled .overlap-6 {
+  height: 198px;
+  left: 10px;
+  top: 9px;
+}
+
+.marker-stack.property-1-default .overlap-6 {
+  height: 90px;
+  left: 0;
+  top: 0;
+}

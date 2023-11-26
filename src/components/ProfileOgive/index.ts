@@ -1,0 +1,1 @@
+export { ProfileOgive } from "./ProfileOgive";

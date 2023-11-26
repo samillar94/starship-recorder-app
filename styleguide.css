@@ -1,0 +1,47 @@
+:root {
+  --build-teal: rgba(1, 178, 189, 1);
+  --event-purple: rgba(99, 0, 199, 1);
+  --generated-ID-font-family: "Gelion Thin", Helvetica;
+  --generated-ID-font-size: 10px;
+  --generated-ID-font-style: normal;
+  --generated-ID-font-weight: 100;
+  --generated-ID-letter-spacing: 0px;
+  --generated-ID-line-height: normal;
+  --marker-c-label-font-family: "Gelion-Bold", Helvetica;
+  --marker-c-label-font-size: 10px;
+  --marker-c-label-font-style: normal;
+  --marker-c-label-font-weight: 700;
+  --marker-c-label-letter-spacing: 0px;
+  --marker-c-label-line-height: normal;
+  --marker-description-list-label-maximum-font-family: "Gelion-Regular",
+    Helvetica;
+  --marker-description-list-label-maximum-font-size: 8px;
+  --marker-description-list-label-maximum-font-style: normal;
+  --marker-description-list-label-maximum-font-weight: 400;
+  --marker-description-list-label-maximum-letter-spacing: 0px;
+  --marker-description-list-label-maximum-line-height: normal;
+  --marker-main-label-maximum-font-family: "DIN2014", "Bahnschrift", Helvetica;
+  --marker-main-label-maximum-font-size: 20px;
+  --marker-main-label-maximum-font-style: normal;
+  --marker-main-label-maximum-font-weight: 700;
+  --marker-main-label-maximum-letter-spacing: 0px;
+  --marker-main-label-maximum-line-height: 100%;
+  --record-card-entry-font-family: "Gelion-Regular", Helvetica;
+  --record-card-entry-font-size: 10px;
+  --record-card-entry-font-style: normal;
+  --record-card-entry-font-weight: 400;
+  --record-card-entry-letter-spacing: 0px;
+  --record-card-entry-line-height: normal;
+  --rw-dark: rgba(33, 33, 33, 1);
+  --rw-light: rgba(222, 222, 222, 1);
+  --service-green: rgba(143, 209, 79, 1);
+  --ship-blue: rgba(45, 155, 240, 1);
+  --something-grey: rgba(128, 128, 128, 1);
+  --source-green: rgba(0, 119, 62, 1);
+  --special-yellow: rgba(206, 163, 8, 1);
+  --stack-pink: rgba(224, 0, 255, 1);
+  --superheavy-red: rgba(242, 71, 38, 1);
+  --tardis-blue: rgba(3, 0, 137, 1);
+  --thing-brown: rgba(163, 98, 0, 1);
+  --white: rgba(255, 255, 255, 1);
+}
