@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import "./index.css";
 
 import MapComponent from "./components/MapComponent";
@@ -14,4 +14,8 @@ const App: React.FC = () => {
   );
 };
 
-ReactDOM.render(<App />, document.getElementById("app"));
+const container = document.getElementById("app");
+if (container) {
+  const root = createRoot(container);
+  root.render(<App />);
+}

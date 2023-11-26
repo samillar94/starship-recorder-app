@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import "/styleguide.css";
 
 import "ol/ol.css";
@@ -55,27 +55,18 @@ const MapComponent = () => {
 
       // Create a styled marker element (red circle)
       const markerElement = document.createElement("div");
-      ReactDOM.render(
+      const root = createRoot(markerElement);
+      root.render(
         <MarkerCircle
           className="marker-m-circle-instance"
           divClassName="marker-circle-2"
           divClassNameOverride="marker-circle-3"
-          overlapGroupClassName="X"
+          overlapGroupClassName="--special-yellow"
           stateProp="normal"
           code="B14.1 F:3"
           thingIds="#175"
-          // timeArc="/static/img/time-arc-7.svg"
-        />,
-        markerElement
+        />
       );
-      // markerElement.style.width = "30px";
-      // markerElement.style.height = "30px";
-      // markerElement.style.background = "red";
-      // markerElement.style.borderRadius = "50%";
-      // markerElement.style.opacity = "0.7";
-      // markerElement.style.textAlign = "center";
-      // markerElement.style.fontWeight = "500";
-      // markerElement.innerHTML = "B10";
 
       // Create a marker overlay
       const marker = new Overlay({
@@ -88,7 +79,17 @@ const MapComponent = () => {
       // Add the overlays to the map
       map.addOverlay(marker);
 
-      return () => map.dispose(); // Cleanup on unmount
+      map.on("moveend", () => {
+        console.log("moved");
+        const zoom = map.getView().getZoom();
+        if (zoom) {
+          const markerSize = 9 * 2 ** (9 - zoom); // Adjust the marker size based on zoom level
+          markerElement.style.width = `${markerSize}px`;
+          markerElement.style.height = `${markerSize}px`;
+        }
+      });
+
+      // return () => map.dispose(); // Cleanup on unmount
     }
   }, []);
 

@@ -12,10 +12,17 @@ import { TimeButton } from "../TimeButton";
 import "./style.css";
 import "/styleguide.css";
 
+type articleClass =
+  | "--ship-blue"
+  | "--superheavy-red"
+  | "--stack-pink"
+  | "--service-green"
+  | "--special-yellow";
+
 interface Props {
   stateProp: "labelled" | "normal";
   className: any;
-  overlapGroupClassName: any;
+  overlapGroupClassName: articleClass;
   timeArc?: string;
   divClassName: any;
   code: string;
@@ -37,14 +44,6 @@ export const MarkerCircle = ({
     state: stateProp || "normal",
   });
 
-  // const colorMap = {
-  //   S: "--ship-blue",
-  //   B: "--superheavy-red",
-  //   SB: "--stack-pink",
-  //   G: "--service-green",
-  //   X: "--special-yellow",
-  // };
-
   return (
     <div
       className={`marker-circle ${state.state} ${className}`}
@@ -54,7 +53,10 @@ export const MarkerCircle = ({
     >
       <div className="marker-2">
         {state.state === "normal" && (
-          <div className={`overlap-group ${overlapGroupClassName}`}>
+          <div
+            className={`overlap-group ${overlapGroupClassName}`}
+            style={{ backgroundColor: `var(${overlapGroupClassName})` }}
+          >
             <img className="time-arc" alt="Time arc" src={timeArc} />
             <div className={`marker-main-label ${divClassName}`}>
               <p>{code}</p>
@@ -147,7 +149,10 @@ export const MarkerCircle = ({
                 dispatch("click_218");
               }}
             >
-              <div className="overlap-group">
+              <div
+                className="overlap-group"
+                style={{ backgroundColor: `var(${overlapGroupClassName})` }}
+              >
                 <img
                   className="time-arc"
                   alt="Time arc"
