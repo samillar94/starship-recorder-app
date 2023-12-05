@@ -3,29 +3,77 @@ import { createRoot } from "react-dom/client";
 import "/styleguide.css";
 
 import "ol/ol.css";
+import Feature from "ol/Feature";
 import Map from "ol/Map";
 import View from "ol/View";
-import TileLayer from "ol/layer/Tile";
-import OSM from "ol/source/OSM";
 import Overlay from "ol/Overlay";
+import { Circle } from "ol/geom.js";
+import { OSM, Vector as VectorSource } from "ol/source";
+import { Style, Text } from "ol/style.js";
+import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 import { Projection, fromLonLat } from "ol/proj";
-import Rotate from "ol/control/Rotate.js";
-import MousePosition from "ol/control/MousePosition.js";
+import { Rotate, MousePosition } from "ol/control";
 import { createStringXY } from "ol/coordinate";
+import CanvasImmediateRenderer from "ol/render/canvas/Immediate";
 
 import { MarkerCircle } from "./MarkerCircle";
 
 const MapComponent = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
+
   const startPosition = [-10818843.3, 2997374.6];
+  const htmlMarkerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (mapRef.current) {
+      const circleFeature = new Feature({
+        geometry: new Circle(startPosition, 4.5),
+      });
+      circleFeature.setStyle(
+        new Style({
+          renderer(coordinates, state) {
+            const [[x, y], [x1, y1]] = coordinates;
+            const ctx = state.context;
+            const dx = x1 - x;
+            const dy = y1 - y;
+            const radius = Math.sqrt(dx * dx + dy * dy);
+
+            const innerRadius = 0;
+            const outerRadius = radius * 1.4;
+
+            const gradient = ctx.createRadialGradient(
+              x,
+              y,
+              innerRadius,
+              x,
+              y,
+              outerRadius
+            );
+            gradient.addColorStop(0, "rgba(255,0,0,0)");
+            gradient.addColorStop(0.6, "rgba(255,0,0,0.2)");
+            gradient.addColorStop(1, "rgba(255,0,0,0.8)");
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
+            ctx.strokeStyle = "rgba(255,0,0,1)";
+            ctx.stroke();
+          },
+        })
+      );
+
       const map = new Map({
         target: mapRef.current,
         layers: [
           new TileLayer({
             source: new OSM(),
+          }),
+          new VectorLayer({
+            source: new VectorSource({
+              features: [circleFeature],
+            }),
           }),
         ],
         view: new View({
@@ -51,7 +99,7 @@ const MapComponent = () => {
 
       // Convert marker coordinates to the map's projection
       // const markerPosition = fromLonLat(markerCoord);
-      const markerPosition = [-10818843.3, 2997374.6];
+      const markerPosition = startPosition;
 
       // Create a styled marker element (red circle)
       const markerElement = document.createElement("div");
@@ -79,25 +127,14 @@ const MapComponent = () => {
       // Add the overlays to the map
       map.addOverlay(marker);
 
-      map.on("moveend", () => {
-        console.log("moved");
-        const zoom = map.getView().getZoom();
-        if (zoom) {
-          const markerSize = 9 * 2 ** (9 - zoom); // Adjust the marker size based on zoom level
-          markerElement.style.width = `${markerSize}px`;
-          markerElement.style.height = `${markerSize}px`;
-        }
-      });
-
-      // return () => map.dispose(); // Cleanup on unmount
+      return () => map.dispose(); // Cleanup on unmount
     }
   }, []);
 
   return (
-    <div
-      ref={mapRef}
-      style={{ width: "100%", height: "100%", position: "absolute" }}
-    />
+    <div style={{ position: "absolute", width: "100%", height: "100%" }}>
+      <div ref={mapRef} style={{ width: "100%", height: "100%" }} />
+    </div>
   );
 };
 
