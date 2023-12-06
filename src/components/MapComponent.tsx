@@ -9,7 +9,7 @@ import View from "ol/View";
 import Overlay from "ol/Overlay";
 import { Circle } from "ol/geom.js";
 import { OSM, Vector as VectorSource } from "ol/source";
-import { Style, Text } from "ol/style.js";
+import { Fill, Stroke, Style, Text } from "ol/style.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 import { Projection, fromLonLat } from "ol/proj";
 import { Rotate, MousePosition } from "ol/control";
@@ -29,40 +29,52 @@ const MapComponent = () => {
       const circleFeature = new Feature({
         geometry: new Circle(startPosition, 4.5),
       });
-      circleFeature.setStyle(
-        new Style({
-          renderer(coordinates, state) {
-            const [[x, y], [x1, y1]] = coordinates;
-            const ctx = state.context;
-            const dx = x1 - x;
-            const dy = y1 - y;
-            const radius = Math.sqrt(dx * dx + dy * dy);
 
-            const innerRadius = 0;
-            const outerRadius = radius * 1.4;
+      let markerCircle = new Style({
+        renderer(coordinates, state) {
+          const [[x, y], [x1, y1]] = coordinates;
+          const ctx = state.context;
+          const dx = x1 - x;
+          const dy = y1 - y;
+          const radius = Math.sqrt(dx * dx + dy * dy);
 
-            const gradient = ctx.createRadialGradient(
-              x,
-              y,
-              innerRadius,
-              x,
-              y,
-              outerRadius
-            );
-            gradient.addColorStop(0, "rgba(255,0,0,0)");
-            gradient.addColorStop(0.6, "rgba(255,0,0,0.2)");
-            gradient.addColorStop(1, "rgba(255,0,0,0.8)");
-            ctx.beginPath();
-            ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
-            ctx.fillStyle = gradient;
-            ctx.fill();
+          const innerRadius = 0;
+          const outerRadius = radius * 1.4;
 
-            ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
-            ctx.strokeStyle = "rgba(255,0,0,1)";
-            ctx.stroke();
-          },
-        })
-      );
+          const gradient = ctx.createRadialGradient(
+            x,
+            y,
+            innerRadius,
+            x,
+            y,
+            outerRadius
+          );
+          gradient.addColorStop(0, "rgba(255,0,0,0)");
+          gradient.addColorStop(0.6, "rgba(255,0,0,0.2)");
+          gradient.addColorStop(1, "rgba(255,0,0,0.8)");
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
+          ctx.fillStyle = gradient;
+          ctx.fill();
+
+          ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
+          ctx.strokeStyle = "rgba(255,0,0,1)";
+          ctx.stroke();
+        },
+      });
+      let markerText = new Style({
+        text: new Text({
+          text: "B10",
+          font: "bold 10px DIN2014, Bahnschrift,sans-serif",
+          fill: new Fill({
+            color: "#000",
+          }),
+        }),
+      });
+
+      const markerStyles = [markerCircle, markerText];
+
+      // circleFeature.setStyle(circleStyles);
 
       const map = new Map({
         target: mapRef.current,
@@ -74,6 +86,11 @@ const MapComponent = () => {
             source: new VectorSource({
               features: [circleFeature],
             }),
+            style: function (feature, resolution) {
+              var textsize = 0.4 / resolution;
+              markerText?.getText()?.setScale(textsize);
+              return markerStyles;
+            },
           }),
         ],
         view: new View({
@@ -125,7 +142,7 @@ const MapComponent = () => {
       });
 
       // Add the overlays to the map
-      map.addOverlay(marker);
+      // map.addOverlay(marker);
 
       return () => map.dispose(); // Cleanup on unmount
     }
