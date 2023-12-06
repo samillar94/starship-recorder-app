@@ -7,7 +7,7 @@ import Feature from "ol/Feature";
 import Map from "ol/Map";
 import View from "ol/View";
 import Overlay from "ol/Overlay";
-import { Circle } from "ol/geom.js";
+import { Geometry, Circle, Point, Polygon } from "ol/geom.js";
 import { OSM, Vector as VectorSource } from "ol/source";
 import { Fill, Stroke, Style, Text } from "ol/style.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
@@ -18,6 +18,17 @@ import CanvasImmediateRenderer from "ol/render/canvas/Immediate";
 
 import { MarkerCircle } from "./MarkerCircle";
 
+type extentType = "Point" | "Circle" | "Polygon";
+
+type Thing = {
+  position: [number, number];
+  extentType: extentType;
+  radius: number; // Sets marker size
+  polygon?: [number, number][];
+  text: string;
+  rgbAddAlpha: string;
+};
+
 const MapComponent = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
 
@@ -26,55 +37,116 @@ const MapComponent = () => {
 
   useEffect(() => {
     if (mapRef.current) {
-      const circleFeature = new Feature({
-        geometry: new Circle(startPosition, 4.5),
-      });
-
-      let markerCircle = new Style({
-        renderer(coordinates, state) {
-          const [[x, y], [x1, y1]] = coordinates;
-          const ctx = state.context;
-          const dx = x1 - x;
-          const dy = y1 - y;
-          const radius = Math.sqrt(dx * dx + dy * dy);
-
-          const innerRadius = 0;
-          const outerRadius = radius * 1.4;
-
-          const gradient = ctx.createRadialGradient(
-            x,
-            y,
-            innerRadius,
-            x,
-            y,
-            outerRadius
-          );
-          gradient.addColorStop(0, "rgba(255,0,0,0)");
-          gradient.addColorStop(0.6, "rgba(255,0,0,0.2)");
-          gradient.addColorStop(1, "rgba(255,0,0,0.8)");
-          ctx.beginPath();
-          ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
-          ctx.fillStyle = gradient;
-          ctx.fill();
-
-          ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
-          ctx.strokeStyle = "rgba(255,0,0,1)";
-          ctx.stroke();
-        },
-      });
-      let markerText = new Style({
-        text: new Text({
+      const things: Thing[] = [
+        {
+          position: [-10818843.3, 2997374.6],
+          extentType: "Circle",
+          radius: 4.5,
           text: "B10",
-          font: "bold 10px DIN2014, Bahnschrift,sans-serif",
-          fill: new Fill({
-            color: "#000",
-          }),
-        }),
-      });
+          rgbAddAlpha: "rgba(255,0,0,",
+        },
+        {
+          position: [-10818853.3, 2997384.6],
+          extentType: "Circle",
+          radius: 4.5,
+          text: "S28",
+          rgbAddAlpha: "rgba(0,50,255,",
+        },
+      ];
 
-      const markerStyles = [markerCircle, markerText];
+      const thingFeatures: Feature[] = [];
 
-      // circleFeature.setStyle(circleStyles);
+      for (let thing of things) {
+        const { position, extentType, radius, text, rgbAddAlpha } = thing;
+
+        let geometry: Geometry = new Circle(position, radius);
+        let markerStyles: Style[] = [];
+
+        // set feature geometry according to extent
+
+        const thingFeature = new Feature({
+          geometry: geometry,
+          ...thing,
+        });
+
+        let markerStyle = new Style({
+          renderer(coordinates, state) {
+            console.log(state);
+
+            const [[x, y], [x1, y1]] = coordinates as [
+              [number, number],
+              [number, number]
+            ];
+            const renderRadius = x1 - x;
+            const ctx = state.context;
+
+            switch (extentType) {
+              case "Circle":
+                const innerRadius = 0;
+                const outerRadius = renderRadius * 1.4;
+
+                const gradient = ctx.createRadialGradient(
+                  x,
+                  y,
+                  innerRadius,
+                  x,
+                  y,
+                  outerRadius
+                );
+                gradient.addColorStop(0, thing.rgbAddAlpha + "0)");
+                gradient.addColorStop(0.6, thing.rgbAddAlpha + "0.2)");
+                gradient.addColorStop(1, thing.rgbAddAlpha + "0.8)");
+                ctx.beginPath();
+                ctx.arc(x, y, renderRadius, 0, 2 * Math.PI, true);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                ctx.arc(x, y, renderRadius, 0, 2 * Math.PI, true);
+                ctx.strokeStyle = thing.rgbAddAlpha + "1)";
+                ctx.stroke();
+                break;
+              case "Polygon":
+                // TODO
+                break;
+              case "Point":
+              default:
+            }
+            console.log(state.resolution);
+
+            if (state.resolution > 0.5) return;
+
+            const sc = renderRadius;
+            var fill = "#111";
+            ctx.fillStyle = fill;
+
+            var style = "bold";
+            var size = 1;
+            var font = "DIN2014, Bahnschrift,sans-serif";
+
+            ctx.font = `${style} ${size * sc}px ${font}`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            ctx.fillText(text, x, y);
+          },
+        });
+        markerStyles.push(markerStyle);
+
+        // let markerTextOld = new Style({
+        //   text: new Text({
+        //     text: thing.text,
+        //     font: "bold 10px DIN2014, Bahnschrift,sans-serif",
+        //     fill: new Fill({
+        //       color: "#000",
+        //     }),
+        //   }),
+        // });
+        // markerStyles.push(markerTextOld);
+
+        thingFeature.setStyle(markerStyles);
+
+        thingFeatures.push(thingFeature);
+      }
 
       const map = new Map({
         target: mapRef.current,
@@ -84,13 +156,13 @@ const MapComponent = () => {
           }),
           new VectorLayer({
             source: new VectorSource({
-              features: [circleFeature],
+              features: thingFeatures,
             }),
-            style: function (feature, resolution) {
-              var textsize = 0.4 / resolution;
-              markerText?.getText()?.setScale(textsize);
-              return markerStyles;
-            },
+            // style: function (feature, resolution) {
+            //   var textsize = 0.4 / resolution;
+            //   markerText?.getText()?.setScale(textsize);
+            //   return markerStyles;
+            // },
           }),
         ],
         view: new View({
