@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import React, { Context, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import "/styleguide.css";
@@ -14,9 +16,11 @@ import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 import { Projection, fromLonLat } from "ol/proj";
 import { Rotate, MousePosition } from "ol/control";
 import { createStringXY } from "ol/coordinate";
-import CanvasImmediateRenderer from "ol/render/canvas/Immediate";
 
 import { MarkerCircle } from "./MarkerCircle";
+import { features } from "process";
+
+const API_PORT = process.env.API_PORT || 3000;
 
 type extentType = "Point" | "Circle" | "Polygon";
 
@@ -25,9 +29,22 @@ type Thing = {
   extentType: extentType;
   radius: number; // Sets marker size
   shape?: [number, number][];
-  fuzzShape?: [number, number][];
+  fuzzShapes?: [number, number][][];
   text: string;
   rgb: string;
+};
+
+type ThingInViewData = {
+  thingId: number;
+  position: [number, number];
+  crs: number;
+  thingShortName?: string;
+  articleShortName?: string;
+  articleVersionSuffix?: string;
+  partCode?: string | null;
+  partAsset?: string | null;
+  partUnits?: any[];
+  schemeClass?: string;
 };
 
 const renderCircle = (
@@ -38,29 +55,29 @@ const renderCircle = (
   rgb: string,
   hover: boolean
 ) => {
-  const innerRadius = 0;
-  const outerRadius = renderRadius * 1.4;
-  const lineWidth = hover ? 5 : 1;
-  // const lineWidth = 2;
+  const lineWidth = hover ? renderRadius * 0.05 : renderRadius * 0.01;
 
-  const gradient = ctx.createRadialGradient(
-    x,
-    y,
-    innerRadius,
-    x,
-    y,
-    outerRadius
-  );
-  gradient.addColorStop(0, "rgba(" + rgb + ",0)");
-  gradient.addColorStop(0.6, "rgba(" + rgb + ",0.2)");
-  gradient.addColorStop(1, "rgba(" + rgb + ",0.8)");
+  // const innerRadius = 0;
+  // const outerRadius = renderRadius * 1.4;
+  // const gradient = ctx.createRadialGradient(
+  //   x,
+  //   y,
+  //   innerRadius,
+  //   x,
+  //   y,
+  //   outerRadius
+  // );
+  // gradient.addColorStop(0, "rgba(" + rgb + ",0)");
+  // gradient.addColorStop(0.6, "rgba(" + rgb + ",0.2)");
+  // gradient.addColorStop(1, "rgba(" + rgb + ",0.8)");
   ctx.beginPath();
   ctx.arc(x, y, renderRadius, 0, 2 * Math.PI, true);
-  ctx.fillStyle = gradient;
+  ctx.fillStyle = "rgb(" + rgb + ")"; // or gradient
   ctx.fill();
 
-  ctx.arc(x, y, renderRadius, 0, 2 * Math.PI, true);
-  ctx.strokeStyle = "rgba(" + rgb + ",1)";
+  ctx.beginPath();
+  ctx.arc(x, y, renderRadius * 0.95, 1.5 * Math.PI, Math.PI, false); //TODO use arc to display info
+  ctx.strokeStyle = "rgba(255,255,255,1)";
   ctx.lineWidth = lineWidth;
   ctx.stroke();
 };
@@ -76,7 +93,7 @@ const renderText = (
   ctx.fillStyle = fill;
 
   var style = "bold";
-  var size = 1;
+  var size = 0.8;
   var font = "DIN2014, Bahnschrift,sans-serif";
 
   ctx.font = `${style} ${size * renderRadius}px ${font}`;
@@ -86,7 +103,7 @@ const renderText = (
   ctx.fillText(text, x, y);
 };
 
-const renderFuzz = (fuzzShape: [number, number][]) => {
+const renderFuzz = (fuzzShapes: [number, number][][]) => {
   //TODO
 };
 
@@ -107,7 +124,7 @@ const MapComponent = () => {
         ],
         view: new View({
           center: startPosition,
-          zoom: 20,
+          zoom: 19,
           rotation: Math.PI / 4,
         }),
       });
@@ -119,95 +136,131 @@ const MapComponent = () => {
           extentType: "Circle",
           radius: 4.5,
           text: "B10",
-          rgb: "255,0,0",
+          rgb: "242, 71, 38",
         },
         {
           position: [-10818853.3, 2997384.6],
           extentType: "Circle",
           radius: 4.5,
           text: "S28",
-          rgb: "0,50,255",
+          rgb: "45, 155, 240",
         },
       ];
 
       const thingFeatures: Feature[] = [];
 
-      for (let thing of things) {
-        const { position, extentType, radius, shape, fuzzShape, text, rgb } =
-          thing;
+      let thingsEP = `http://localhost:${API_PORT}/thing/inView`;
 
-        let geometry: Geometry = new Circle(position, radius);
-        let markerStyles: Style[] = [];
+      axios.get(thingsEP).then((results) => {
+        if (!results.data.data[0]) return;
+        let thingsInView: ThingInViewData[] = results.data.data;
+        for (let thingRaw of thingsInView) {
+          const {
+            position,
+            partAsset,
+            articleShortName,
+            articleVersionSuffix,
+            partCode,
+            partUnits,
+            schemeClass,
+          } = thingRaw;
 
-        // set feature geometry according to extent
+          const projPosition = fromLonLat(position) as [number, number];
 
-        const thingFeature = new Feature({
-          geometry: geometry,
-          ...thing,
-          hover: false,
-          show: false,
-          renderRadius: 0,
-        });
-
-        let markerStyle = new Style({
-          renderer(coordinates, state) {
-            // console.log(state);
-
-            const [[x, y], [x1, y1]] = coordinates as [
-              [number, number],
-              [number, number]
-            ];
-            const dx = x1 - x;
-            const dy = y1 - y;
-            const renderRadius = Math.sqrt(dx * dx + dy * dy);
-            const ctx = state.context;
-            const { hover } = state.feature.getProperties();
-
-            thingFeature.setProperties({ renderRadius: renderRadius });
-
-            switch (extentType) {
-              case "Circle":
-                renderCircle(ctx, x, y, renderRadius, rgb, hover);
-                break;
-              case "Polygon":
-                // TODO
-                break;
-              case "Point":
-              default:
+          let text = `${articleShortName} ${articleVersionSuffix}\n${partCode}:`;
+          if (partUnits) {
+            let unitArray = [];
+            for (let partUnit of partUnits) {
+              const { numerator, denominator, subunit } = partUnit;
+              let denominatorOptional = "";
+              if (denominator != 1) denominatorOptional = denominator;
+              const { editorialCode, displayedInCombo } = partUnit.unit;
+              let unitBuilder = numerator + denominatorOptional + editorialCode;
+              if (subunit) unitBuilder += subunit;
+              unitArray.push(unitBuilder);
             }
+            text += unitArray.join(".");
+          }
 
-            if (state.resolution > 0.5) return;
-            renderText(ctx, x, y, renderRadius, text);
+          let rgb = "128,128,128";
+          if (schemeClass == "SPECIAL") rgb = "206,163,8";
 
-            if (!hover || !fuzzShape) return;
-            renderFuzz(fuzzShape);
-          },
-        });
-        markerStyles.push(markerStyle);
+          const thing: Thing = {
+            position: projPosition,
+            extentType: "Circle",
+            radius: 4.5,
+            text: text,
+            rgb: rgb,
+          };
+          things.push(thing);
+        }
 
-        // let markerTextOld = new Style({
-        //   text: new Text({
-        //     text: thing.text,
-        //     font: "bold 10px DIN2014, Bahnschrift,sans-serif",
-        //     fill: new Fill({
-        //       color: "#000",
-        //     }),
-        //   }),
-        // });
-        // markerStyles.push(markerTextOld);
+        console.log(things);
 
-        thingFeature.setStyle(markerStyles);
+        for (let thing of things) {
+          const { position, extentType, radius, shape, fuzzShapes, text, rgb } =
+            thing;
 
-        thingFeatures.push(thingFeature);
-      }
+          let geometry: Geometry = new Circle(position, radius);
+          let markerStyles: Style[] = [];
 
-      map.addLayer(
-        new VectorLayer({
-          source: new VectorSource({
-            features: thingFeatures,
-          }),
-        })
-      );
+          // set feature geometry according to extent
+
+          const thingFeature = new Feature({
+            geometry: geometry,
+            ...thing,
+            hover: false,
+            show: false,
+            renderRadius: 0,
+          });
+
+          let markerStyle = new Style({
+            renderer(coordinates, state) {
+              const [[x, y], [x1, y1]] = coordinates as [
+                [number, number],
+                [number, number]
+              ];
+              const dx = x1 - x;
+              const dy = y1 - y;
+              const renderRadius = Math.sqrt(dx * dx + dy * dy);
+              const ctx = state.context;
+              const { hover } = state.feature.getProperties();
+
+              thingFeature.setProperties({ renderRadius: renderRadius });
+
+              switch (extentType) {
+                case "Circle":
+                  renderCircle(ctx, x, y, renderRadius, rgb, hover);
+                  break;
+                case "Polygon":
+                  // TODO
+                  break;
+                case "Point":
+                default:
+              }
+
+              if (state.resolution > 0.5) return;
+              renderText(ctx, x, y, renderRadius, text);
+
+              if (!hover || !fuzzShapes) return;
+              renderFuzz(fuzzShapes);
+            },
+          });
+          markerStyles.push(markerStyle);
+
+          thingFeature.setStyle(markerStyles);
+          console.log(thingFeature);
+
+          thingFeatures.push(thingFeature);
+        }
+        map.addLayer(
+          new VectorLayer({
+            source: new VectorSource({
+              features: thingFeatures,
+            }),
+          })
+        );
+      });
 
       map.addControl(
         new MousePosition({
@@ -265,7 +318,6 @@ const MapComponent = () => {
       // Add the overlays to the map
       // map.addOverlay(marker);
 
-      let lastClickedFeature: Feature | undefined | null = null;
       map.on("click", (evt) => {
         console.log(evt);
         const featureClicked = map.forEachFeatureAtPixel(
@@ -274,49 +326,50 @@ const MapComponent = () => {
             feature = feature as Feature;
             let { show, position, text, renderRadius } =
               feature.getProperties();
-            let [x, y] = position;
-            console.log(position);
 
+            // Position calculation
+            let [x, y] = position;
             let rotation = mapView.getRotation();
-            console.log(rotation);
-            // rotation = 0; //TODO make this rotate correctly
             let resolution = mapView.getResolution();
             if (!resolution) resolution = 1;
             const rightOffset = 1;
-            const upOffset = -1;
+            const upOffset = 1;
             x +=
               renderRadius *
               resolution *
-              (Math.cos(rotation) * rightOffset +
+              (Math.cos(rotation) * rightOffset -
                 Math.sin(rotation) * upOffset);
             y +=
               renderRadius *
               resolution *
-              (Math.sin(rotation) * rightOffset -
+              (Math.sin(rotation) * rightOffset +
                 Math.cos(rotation) * upOffset);
             position = [x, y];
 
-            // console.log(text + show);
             const marker = new Overlay({
               position: position,
               positioning: "top-left",
-              element: markerElement, // more to do here
-              stopEvent: false, // Allows interaction with the map under the marker
+              element: markerElement, //TODO take in feature properties
+              stopEvent: false, // true Disallows interaction with the map under the marker
             });
 
+            // Overlay display logic
+            // console.log(text + show);
             if (show) {
               feature.setProperties({ show: false });
               map.removeOverlay(marker);
             } else {
-              lastClickedFeature?.setProperties({ show: false });
+              for (let featureToUnshow of thingFeatures) {
+                featureToUnshow.setProperties({ show: false });
+              }
               map.getOverlays().clear();
               feature.setProperties({ show: true });
               map.addOverlay(marker);
             }
+
             return feature;
           }
         );
-        lastClickedFeature = featureClicked;
       });
 
       return () => map.dispose(); // Cleanup on unmount
