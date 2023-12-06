@@ -145,6 +145,8 @@ const MapComponent = () => {
           geometry: geometry,
           ...thing,
           hover: false,
+          show: false,
+          renderRadius: 0,
         });
 
         let markerStyle = new Style({
@@ -155,9 +157,13 @@ const MapComponent = () => {
               [number, number],
               [number, number]
             ];
-            const renderRadius = x1 - x;
+            const dx = x1 - x;
+            const dy = y1 - y;
+            const renderRadius = Math.sqrt(dx * dx + dy * dy);
             const ctx = state.context;
             const { hover } = state.feature.getProperties();
+
+            thingFeature.setProperties({ renderRadius: renderRadius });
 
             switch (extentType) {
               case "Circle":
@@ -261,12 +267,36 @@ const MapComponent = () => {
 
       let lastClickedFeature: Feature | undefined | null = null;
       map.on("click", (evt) => {
+        console.log(evt);
         const featureClicked = map.forEachFeatureAtPixel(
           evt.pixel,
           (feature) => {
             feature = feature as Feature;
-            let { show, position, text } = feature.getProperties();
-            console.log(text + show);
+            let { show, position, text, renderRadius } =
+              feature.getProperties();
+            let [x, y] = position;
+            console.log(position);
+
+            let rotation = mapView.getRotation();
+            console.log(rotation);
+            // rotation = 0; //TODO make this rotate correctly
+            let resolution = mapView.getResolution();
+            if (!resolution) resolution = 1;
+            const rightOffset = 1;
+            const upOffset = -1;
+            x +=
+              renderRadius *
+              resolution *
+              (Math.cos(rotation) * rightOffset +
+                Math.sin(rotation) * upOffset);
+            y +=
+              renderRadius *
+              resolution *
+              (Math.sin(rotation) * rightOffset -
+                Math.cos(rotation) * upOffset);
+            position = [x, y];
+
+            // console.log(text + show);
             const marker = new Overlay({
               position: position,
               positioning: "top-left",
