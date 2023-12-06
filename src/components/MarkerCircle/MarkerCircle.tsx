@@ -69,7 +69,7 @@ export const MarkerCircle = ({
           <>
             <div className="label">
               <div className="overlap">
-                <img className="fuzz" alt="Fuzz" src="/img/fuzz.svg" />
+                {/* <img className="fuzz" alt="Fuzz" src="/img/fuzz.svg" /> */}
                 <div className="label-surround" />
                 <div className="label-right">
                   <div className="div">
