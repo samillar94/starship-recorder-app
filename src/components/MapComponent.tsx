@@ -204,7 +204,7 @@ const MapComponent = () => {
           let geometry: Geometry = new Circle(position, radius);
           let markerStyles: Style[] = [];
 
-          // set feature geometry according to extent
+          /// set feature geometry according to extent
 
           const thingFeature = new Feature({
             geometry: geometry,
@@ -269,7 +269,7 @@ const MapComponent = () => {
         })
       );
 
-      // tactile
+      /// tactile
       let pointerOverFeature: Feature | null | undefined = null;
       map.on("pointermove", (evt) => {
         // console.log(evt.pixel);
@@ -288,18 +288,14 @@ const MapComponent = () => {
         pointerOverFeature = featureOver;
       });
 
-      // Get map view to allow alignment of HTML elements to canvas
+      /// Get map view to allow alignment of HTML elements to canvas
       const mapView = map.getView();
-      const extent = mapView.calculateExtent(map.getSize());
 
-      // 'extent' contains the bounding box coordinates in the map's projection
+      /// 'extent' contains the bounding box coordinates in the map's projection
+      const extent = mapView.calculateExtent(map.getSize());
       console.log("Bounding Box Extent:", extent);
 
-      // Convert marker coordinates to the map's projection
-      // const markerPosition = fromLonLat(markerCoord);
-      const markerPosition = startPosition;
-
-      // Create a styled marker element (red circle)
+      /// Marker element
       const markerElement = document.createElement("div");
       const root = createRoot(markerElement);
       root.render(
@@ -350,10 +346,10 @@ const MapComponent = () => {
               position: position,
               positioning: "top-left",
               element: markerElement, //TODO take in feature properties
-              stopEvent: false, // true Disallows interaction with the map under the marker
+              stopEvent: false, /// true disallows interaction with the map under the marker
             });
 
-            // Overlay display logic
+            /// Overlay display logic
             // console.log(text + show);
             if (show) {
               feature.setProperties({ show: false });
