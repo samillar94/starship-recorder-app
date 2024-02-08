@@ -29,7 +29,7 @@ export const FrameMap = (): JSX.Element => {
             className="marker-m-circle-instance"
             divClassName="marker-circle-2"
             divClassNameOverride="marker-circle-3"
-            overlapGroupClassName="marker-9m-circle-90px-instance"
+            overlapGroupClassName="--special-yellow"
             stateProp="normal"
             code="B14.1\nF:3"
             thingIds="#175"
@@ -54,7 +54,7 @@ export const FrameMap = (): JSX.Element => {
             className="marker-circle-4"
             divClassName="design-component-instance-node-3"
             divClassNameOverride="design-component-instance-node-2"
-            overlapGroupClassName="marker-circle-5"
+            overlapGroupClassName="--special-yellow"
             stateProp="normal"
             code="B12"
             thingIds="#40"
@@ -64,7 +64,7 @@ export const FrameMap = (): JSX.Element => {
             className="marker-circle-6"
             divClassName="marker-circle-8"
             divClassNameOverride="design-component-instance-node-2"
-            overlapGroupClassName="marker-circle-7"
+            overlapGroupClassName="--special-yellow"
             stateProp="normal"
             code="S?\nML:4"
             thingIds="#88"
@@ -78,7 +78,7 @@ export const FrameMap = (): JSX.Element => {
             code=":D"
             thingIds="#12"
             timeArc="/img/time-arc-7.svg"
-            overlapGroupClassName={undefined}
+            overlapGroupClassName="--special-yellow"
           />
         </div>
         <div className="toolbar">

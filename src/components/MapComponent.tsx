@@ -25,6 +25,7 @@ const API_PORT = process.env.API_PORT || 3000;
 type extentType = "Point" | "Circle" | "Polygon";
 
 type Thing = {
+  thingId: number;
   position: [number, number];
   extentType: extentType;
   radius: number; // Sets marker size
@@ -132,6 +133,7 @@ const MapComponent = () => {
       //TODO replace this with API call
       const things: Thing[] = [
         {
+          thingId: -1,
           position: [-10818843.3, 2997374.6],
           extentType: "Circle",
           radius: 4.5,
@@ -139,6 +141,7 @@ const MapComponent = () => {
           rgb: "242, 71, 38",
         },
         {
+          thingId: -2,
           position: [-10818853.3, 2997384.6],
           extentType: "Circle",
           radius: 4.5,
@@ -156,6 +159,7 @@ const MapComponent = () => {
         let thingsInView: ThingInViewData[] = results.data.data;
         for (let thingRaw of thingsInView) {
           const {
+            thingId,
             position,
             partAsset,
             articleShortName,
@@ -186,6 +190,7 @@ const MapComponent = () => {
           if (schemeClass == "SPECIAL") rgb = "206,163,8";
 
           const thing: Thing = {
+            thingId: thingId,
             position: projPosition,
             extentType: "Circle",
             radius: 4.5,
@@ -295,22 +300,9 @@ const MapComponent = () => {
       const extent = mapView.calculateExtent(map.getSize());
       console.log("Bounding Box Extent:", extent);
 
-      /// Marker element
+      /// Marker element - will be filled in map.on click
       const markerElement = document.createElement("div");
-      const root = createRoot(markerElement);
-      root.render(
-        <MarkerCircle
-          className="marker-m-circle-instance"
-          divClassName="marker-circle-2"
-          divClassNameOverride="marker-circle-3"
-          overlapGroupClassName="--special-yellow"
-          stateProp="labelled"
-          code="B14.1 F:3"
-          thingIds="#175"
-        />
-      );
 
-      // Create a marker overlay
       // Add the overlays to the map
       // map.addOverlay(marker);
 
@@ -320,7 +312,7 @@ const MapComponent = () => {
           evt.pixel,
           (feature) => {
             feature = feature as Feature;
-            let { show, position, text, renderRadius } =
+            let { show, position, text, renderRadius, thingId } =
               feature.getProperties();
 
             // Position calculation
@@ -341,6 +333,19 @@ const MapComponent = () => {
               (Math.sin(rotation) * rightOffset +
                 Math.cos(rotation) * upOffset);
             position = [x, y];
+
+            const root = createRoot(markerElement);
+            root.render(
+              <MarkerCircle
+                className="marker-m-circle-instance"
+                divClassName="marker-circle-2"
+                divClassNameOverride="marker-circle-3"
+                overlapGroupClassName="--special-yellow"
+                stateProp="labelled"
+                code={text}
+                thingIds={thingId}
+              />
+            );
 
             const marker = new Overlay({
               position: position,
